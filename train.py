@@ -32,6 +32,9 @@ print(f"Device selected: {device}")
 model = SimpleNNModel().to(device)
 print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
+if device == "cuda":
+    torch.compile(model, "reduce-overhead")
+
 # Loss
 loss_fn = nn.MSELoss()
 
@@ -64,10 +67,12 @@ for epoch in range(EPOCHS):
         # Add noise to inputs
         x = t.unsqueeze(-1).unsqueeze(-1) * z + (1 - t.unsqueeze(-1).unsqueeze(-1)) * epsilon
 
-        # Get direction from vector field at time t
-        outputs = model(x, t)
+        with torch.amp.autocast(device_type=device):
+            # Get direction from vector field at time t
+            outputs = model(x, t)
 
-        loss = loss_fn(outputs, (z - epsilon))
+            loss = loss_fn(outputs, (z - epsilon))
+        
         loss.backward()
 
         # Update the model
