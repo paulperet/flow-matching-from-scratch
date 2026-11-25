@@ -26,6 +26,8 @@ elif torch.backends.mps.is_available():
 else:
     device = "cpu"
 
+print(f"Device selected: {device}")
+
 # Model
 model = SimpleNNModel().to(device)
 print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
