@@ -33,7 +33,7 @@ model = SimpleNNModel().to(device)
 print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
 if device == "cuda":
-    torch.compile(model, "reduce-overhead")
+    model.compile("reduce-overhead")
 
 # Loss
 loss_fn = nn.MSELoss()
