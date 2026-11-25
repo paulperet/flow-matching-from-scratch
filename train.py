@@ -19,8 +19,15 @@ print(f"Dataset size: {len(dataset)}")
 # Data loaders
 training_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
+if torch.cuda.is_available():
+    device = torch.cuda
+elif torch.backends.mps.is_available():
+    device = torch.mps
+else:
+    device = torch.cpu
+
 # Model
-model = SimpleNNModel()
+model = SimpleNNModel().to(device)
 print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
 
 # Loss
