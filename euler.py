@@ -8,15 +8,16 @@ def euler(model, number_steps):
     step_size = 1 / number_steps
 
     # Gaussian noise / Initial state
-    x = torch.normal(mean=torch.zeros(1, INPUT_SIZE), std=torch.ones(1, INPUT_SIZE))
+    x = torch.normal(mean=torch.zeros(1, 3, 8, 8), std=torch.ones(1, 3, 8, 8))
 
     # Denoising / Generating samples
     for i in range(number_steps):
-        x = x + step_size * model(x, torch.tensor([t]).unsqueeze(0))
-        t = t+step_size
+        x += step_size * model(x, torch.tensor([t]).unsqueeze(0))
+        t += step_size
+        print(t)
 
     # Final image
-    x = torch.func.rearrange(x, "b (c h w) -> b c h w", c=3, h=32, w=32)
+    # x = torch.func.rearrange(x, "b (c h w) -> b c h w", c=3, h=32, w=32)
 
     # Remove batch dim
     x = x.squeeze(0)
@@ -29,6 +30,6 @@ def euler(model, number_steps):
     plt.show()
 
 if __name__ == "__main__":
-    from model import SimpleNNModel
+    from models import SimpleNNModel
     model = SimpleNNModel()
     euler(model=model, number_steps=10)
