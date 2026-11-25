@@ -11,7 +11,7 @@ BATCH_SIZE = 4
 dataset = torchvision.datasets.Flowers102('./data', transform=transform, download=True)
 
 # Data loaders
-training_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
+training_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 # From Pytorch Docs
 # Helper function for inline image display

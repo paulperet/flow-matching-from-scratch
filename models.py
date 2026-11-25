@@ -6,21 +6,18 @@ class SimpleNNModel(nn.Module):
         super().__init__()
 
         self.net = nn.Sequential(
-            nn.Linear(3*32*32+1, 8096),
+            nn.Flatten(),
+            nn.Linear(3*32*32, 4096),
             nn.ReLU(),
-            nn.Linear(8096, 8096),
+            nn.Linear(4096, 4096),
             nn.ReLU(),
-            nn.Linear(8096, 8096),
+            nn.Linear(4096, 4096),
             nn.ReLU(),
-            nn.Linear(8096, 8096),
-            nn.ReLU(),
-            nn.Linear(8096, 3*32*32)
+            nn.Linear(4096, 3*32*32)
         )
 
-    def forward(self, images, time):
-        images = torch.flatten(images, start_dim=1)
-        inputs = torch.cat((images, time), dim=-1)
-        return self.net(inputs).reshape((-1, 3, 32, 32))
+    def forward(self, inputs, time):
+        return self.net(inputs).reshape(-1, 3, 32, 32)
 
 class SimpleCNNModel(nn.Module):
     def __init__(self):

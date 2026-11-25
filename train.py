@@ -5,15 +5,15 @@ from torchvision.transforms import v2
 
 from tqdm import tqdm
 
-from models import SimpleNNModel, SimpleCNNModel
+from models import SimpleNNModel, SimpleCNNModel, SimpleUNetModel
 from transforms import transform
 
-EPOCHS = 1000
-BATCH_SIZE = 512
+EPOCHS = 5
+BATCH_SIZE = 1024
 INPUT_SIZE = 3*32*32
 
 # Flowers102 Dataset
-dataset = torchvision.datasets.Flowers102('./data', transform=transform, download=True)
+dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
 print(f"Dataset size: {len(dataset)}")
 
 # Data loaders
@@ -30,15 +30,14 @@ print(f"Device selected: {device}")
 
 # Model
 model = SimpleNNModel().to(device)
+model.compile()
 print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
-
-if device == "cuda":
-    model.compile()
 
 # Loss
 loss_fn = nn.MSELoss()
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+scaler = torch.amp.GradScaler(device=device)
 
 # Progress Bar
 progress_bar = tqdm(total=EPOCHS)
@@ -62,21 +61,23 @@ for epoch in range(EPOCHS):
         t = torch.rand(batch_size).unsqueeze(-1).to(device)
 
         # Sample noise from normal distribution
-        epsilon = torch.normal(mean=torch.zeros(batch_size, 3, 8, 8), std=torch.ones(batch_size, 3, 8, 8)).to(device)
+        epsilon = torch.normal(mean=torch.zeros(batch_size, 3, 32, 32), std=torch.ones(batch_size, 3, 32, 32)).to(device)
 
         # Add noise to inputs
         x = t.unsqueeze(-1).unsqueeze(-1) * z + (1 - t.unsqueeze(-1).unsqueeze(-1)) * epsilon
 
-        with torch.amp.autocast(device_type=device):
+        with torch.amp.autocast(device_type=device, dtype=torch.bfloat16):
             # Get direction from vector field at time t
             outputs = model(x, t)
 
             loss = loss_fn(outputs, (z - epsilon))
+
         
-        loss.backward()
+        scaler.scale(loss).backward()
 
         # Update the model
-        optimizer.step()
+        scaler.step(optimizer)
+        scaler.update()
 
         running_loss += loss.item()
 
@@ -87,5 +88,5 @@ for epoch in range(EPOCHS):
     progress_bar.set_description(f"Epoch {epoch} loss: {running_loss / len(training_loader)}")
     progress_bar.update(1)
 
-# Save Model
-torch.save(model, 'model.pth')
+    # Save Model
+    torch.save(model, 'model.pth')
