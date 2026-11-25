@@ -20,11 +20,11 @@ print(f"Dataset size: {len(dataset)}")
 training_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 if torch.cuda.is_available():
-    device = torch.cuda
+    device = "cuda"
 elif torch.backends.mps.is_available():
-    device = torch.mps
+    device = "mps"
 else:
-    device = torch.cpu
+    device = "cpu"
 
 # Model
 model = SimpleNNModel().to(device)
