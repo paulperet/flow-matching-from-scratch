@@ -46,6 +46,7 @@ for epoch in range(EPOCHS):
 
     for i, images in enumerate(training_loader):
         z, _ = images
+        z = z.to(device)
 
         batch_size = z.shape[0]
 
@@ -53,10 +54,10 @@ for epoch in range(EPOCHS):
         optimizer.zero_grad()
 
         # Sample time t from uniform distribution [0,1]
-        t = torch.rand(batch_size).unsqueeze(-1)
+        t = torch.rand(batch_size).unsqueeze(-1).to(device)
 
         # Sample noise from normal distribution
-        epsilon = torch.normal(mean=torch.zeros(batch_size, 3, 8, 8), std=torch.ones(batch_size, 3, 8, 8))
+        epsilon = torch.normal(mean=torch.zeros(batch_size, 3, 8, 8), std=torch.ones(batch_size, 3, 8, 8)).to(device)
 
         # Add noise to inputs
         x = t.unsqueeze(-1).unsqueeze(-1) * z + (1 - t.unsqueeze(-1).unsqueeze(-1)) * epsilon
