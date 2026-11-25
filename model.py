@@ -6,11 +6,11 @@ class SimpleNNModel(nn.Module):
         super().__init__()
 
         self.net = nn.Sequential(
-            nn.Linear(32*32, 1024),
+            nn.Linear(3*32*32, 1024),
             nn.ReLU(),
             nn.Linear(1024, 1024),
             nn.ReLU(),
-            nn.Linear(1024, 32*32)
+            nn.Linear(1024, 3*32*32)
         )
 
     def forward(self, input):
