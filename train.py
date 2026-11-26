@@ -67,7 +67,7 @@ for epoch in range(EPOCHS):
         # Add noise to inputs
         x = t.unsqueeze(-1).unsqueeze(-1) * z + (1 - t.unsqueeze(-1).unsqueeze(-1)) * epsilon
 
-        with torch.amp.autocast(device_type=device, dtype=torch.bfloat16):
+        with torch.amp.autocast(device_type=device, dtype=torch.float16):
             # Get direction from vector field at time t
             outputs = model(x, t)
             loss = loss_fn(outputs, (z - epsilon))
