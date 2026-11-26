@@ -126,9 +126,9 @@ class SimpleUNetModel(nn.Module):
             nn.Conv2d(in_channels=64, out_channels=3, kernel_size=1, padding=0, stride=1), # 64x32x32-> 3x32x32
         )
 
-        self.buffer1 = torch.zeros(batch_size, 512, 8, 8)
-        self.buffer2 = torch.zeros(batch_size, 256, 16, 16)
-        self.buffer3 = torch.zeros(batch_size, 128, 32, 32)
+        self.buffer1 = torch.empty((batch_size, 512, 8, 8))
+        self.buffer2 = torch.empty((batch_size, 256, 16, 16))
+        self.buffer3 = torch.empty((batch_size, 128, 32, 32))
 
     def forward(self, inputs, time):
         conv1 = self.conv1(inputs)
@@ -155,9 +155,9 @@ class SimpleUNetModel(nn.Module):
         return deconv3
 
 if __name__ == "__main__":
-    models = [SimpleNNModel(), SimpleCNNModel(), SimpleUNetModel()]
+    models = [SimpleNNModel(), SimpleCNNModel(), SimpleUNetModel(batch_size=512)]
     for model in models:
-        input = torch.randn(1, 3, 32, 32)
-        time = torch.randn(1, 1)
+        input = torch.randn(512, 3, 32, 32)
+        time = torch.randn(512, 1)
         output = model(input, time)
         print(f"{type(model).__name__} input: {input.shape}, output: {output.shape}")
