@@ -7,11 +7,15 @@ from tqdm import tqdm
 
 from models.tests import SimpleNNModel, SimpleCNNModel, SimpleUNetModel
 from utils.transforms import transform
+from utils.custom_dataset import CustomImageDataset
 
-def train(model, batch_size, epochs, output_file='model.pth', num_workers=0):
+def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dataset_path=None):
 
     # Flowers102 Dataset
-    dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
+    if dataset_path == None:
+        dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
+    else:
+        dataset = CustomImageDataset(dataset_path, transform)
     print(f"Dataset size: {len(dataset)}, Number of workers: {num_workers}")
 
     # Data loaders
@@ -36,7 +40,7 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0):
     
     if device == "cuda":
         model.compile()
-    print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+    print(f"Model: {type(model).__name__}, Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}\n")
 
     # Loss
     loss_fn = nn.MSELoss()

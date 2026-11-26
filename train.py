@@ -51,6 +51,14 @@ def parse_args():
         default=0
     )
 
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        required=False,
+        help="path to dataset (folder containing images)",
+        default=None
+    )
+
     args = parser.parse_args()
     return args
 
@@ -63,4 +71,5 @@ if __name__ == "__main__":
         batch_size=args.batch_size,
         output_file=args.output_file,
         num_workers=args.num_workers,
+        dataset_path=args.dataset,
     )
