@@ -8,14 +8,14 @@ from tqdm import tqdm
 from models.tests import SimpleNNModel, SimpleCNNModel, SimpleUNetModel
 from utils.transforms import transform
 
-def train(model, batch_size, epochs, output_file='model.pth'):
+def train(model, batch_size, epochs, output_file='model.pth', num_workers=0):
 
     # Flowers102 Dataset
     dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
-    print(f"Dataset size: {len(dataset)}")
+    print(f"Dataset size: {len(dataset)}, Number of workers: {num_workers}")
 
     # Data loaders
-    training_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    training_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
     if torch.cuda.is_available():
         device = "cuda"

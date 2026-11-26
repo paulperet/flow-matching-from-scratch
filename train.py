@@ -43,6 +43,14 @@ def parse_args():
         default=1e-4
     )
 
+    parser.add_argument(
+        "--num-workers",
+        type=int,
+        required=False,
+        help="num workers",
+        default=0
+    )
+
     args = parser.parse_args()
     return args
 
@@ -54,4 +62,5 @@ if __name__ == "__main__":
         epochs=args.epochs,
         batch_size=args.batch_size,
         output_file=args.output_file,
+        num_workers=args.num_workers,
     )
