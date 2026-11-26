@@ -62,7 +62,7 @@ class SimpleCNNModel(nn.Module):
         return outputs
 
 class SimpleUNetModel(nn.Module):
-    def __init__(self):
+    def __init__(self, batch_size=1):
         super().__init__()
 
         self.conv1 = nn.Sequential(
@@ -109,7 +109,7 @@ class SimpleUNetModel(nn.Module):
         )
 
         self.deconv2 = nn.Sequential(
-            nn.Conv2d(in_channels=256, out_channels=128, kernel_size=3, padding=1, stride=1), # 128x8x8 + 128x8x8 -> 128x16x16
+            nn.Conv2d(in_channels=256, out_channels=128, kernel_size=3, padding=1, stride=1), # 128x16x16 + 128x16x16 -> 128x16x16
             nn.ReLU(),
             nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, padding=1, stride=1), # 128x16x16 -> 128x16x16
             nn.ReLU(),
@@ -126,6 +126,10 @@ class SimpleUNetModel(nn.Module):
             nn.Conv2d(in_channels=64, out_channels=3, kernel_size=1, padding=0, stride=1), # 64x32x32-> 3x32x32
         )
 
+        self.buffer1 = torch.zeros(batch_size, 512, 8, 8)
+        self.buffer2 = torch.zeros(batch_size, 256, 16, 16)
+        self.buffer3 = torch.zeros(batch_size, 128, 32, 32)
+
     def forward(self, inputs, time):
         conv1 = self.conv1(inputs)
         conv2 = self.conv2(conv1)
@@ -133,9 +137,20 @@ class SimpleUNetModel(nn.Module):
 
         bottleneck = self.bottleneck(conv3)
 
-        deconv1 = self.deconv1(torch.cat((conv3, bottleneck), dim=1))
-        deconv2 = self.deconv2(torch.cat((conv2, deconv1), dim=1))
-        deconv3 = self.deconv3(torch.cat((conv1, deconv2), dim=1))
+        self.buffer1[:, conv3.size()[1]:, :, :] = conv3
+        self.buffer1[:, :conv3.size()[1], :, :] = bottleneck
+
+        deconv1 = self.deconv1(self.buffer1)
+
+        self.buffer2[:, conv2.size()[1]:, :, :] = conv2
+        self.buffer2[:, :conv2.size()[1], :, :] = deconv1
+
+        deconv2 = self.deconv2(self.buffer2)
+
+        self.buffer3[:, conv1.size()[1]:, :, :] = conv1
+        self.buffer3[:, :conv1.size()[1], :, :] = deconv2
+
+        deconv3 = self.deconv3(self.buffer3)
 
         return deconv3
 
