@@ -21,13 +21,15 @@ training_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, sh
 
 if torch.cuda.is_available():
     device = "cuda"
+elif torch.backends.mps.is_available():
+    device = "mps"
 else:
     device = "cpu"
 
 print(f"Device selected: {device}")
 
 # Model
-model = SimpleUNetModel(batch_size=BATCH_SIZE).to(device)
+model = SimpleUNetModel().to(device)
 if device == "cuda":
     model.compile()
 print(f"Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
