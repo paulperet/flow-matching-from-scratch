@@ -1,6 +1,5 @@
 import torch
-from models import SimpleNNModel
-from euler import euler
+from sampler.euler import euler
 
 PATH = 'model.pth'
 

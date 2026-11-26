@@ -1,5 +1,5 @@
 import torch
-from transforms import transform
+from utils.transforms import transform
 import torchvision
 
 import matplotlib.pyplot as plt
@@ -8,10 +8,10 @@ import numpy as np
 BATCH_SIZE = 4
 
 # Flowers102 Dataset
-dataset = torchvision.datasets.Flowers102('./data', transform=transform, download=True)
+dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
 
 # Data loaders
-training_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False)
+training_loader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 # From Pytorch Docs
 # Helper function for inline image display

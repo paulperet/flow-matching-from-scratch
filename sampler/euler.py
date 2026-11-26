@@ -40,6 +40,6 @@ def euler(model, number_steps):
     plt.show()
 
 if __name__ == "__main__":
-    from models import SimpleNNModel
+    from models.tests import SimpleNNModel
     model = SimpleNNModel()
     euler(model=model, number_steps=10)
