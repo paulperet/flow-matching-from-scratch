@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from models.tests import SimpleNNModel, SimpleCNNModel, SimpleUNetModel
 from utils.transforms import transform
-from utils.custom_dataset import CustomImageDataset
+from utils.custom_dataset import CustomImageDataset, CustomImageDatasetBuffer
 
 def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dataset_path=None):
 
@@ -15,7 +15,7 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
     if dataset_path == None:
         dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
     else:
-        dataset = CustomImageDataset(dataset_path, transform)
+        dataset = CustomImageDatasetBuffer(dataset_path, transform)
     print(f"Dataset size: {len(dataset)}, Number of workers: {num_workers}")
 
     # Data loaders
