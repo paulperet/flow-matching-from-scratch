@@ -1,7 +1,7 @@
 import os
 from torch.utils.data import Dataset
 import cv2
-from random import shuffle as shf
+import random
 import multiprocessing
 
 class CustomImageDataset(Dataset):
@@ -52,7 +52,7 @@ class CustomImageDatasetBufferSingle(Dataset):
 def custom_dataset_split(img_dir, transform, val_size=1000, shuffle=True):
     image_paths = os.listdir(img_dir)
     if shuffle:
-        shf(image_paths)
+        random.shuffle(image_paths)
     train_set = CustomImageDatasetBufferSingle(img_dir, image_paths[val_size:], transform)
     val_set = CustomImageDatasetBufferSingle(img_dir, image_paths[:val_size], transform)
     return train_set, val_set
