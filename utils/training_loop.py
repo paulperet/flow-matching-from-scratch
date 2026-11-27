@@ -2,12 +2,13 @@ import torch
 import torch.nn as nn
 import torchvision
 from torchvision.transforms import v2
+from torch.utils.tensorboard import SummaryWriter
 
 from tqdm import tqdm
 
 from models.tests import SimpleNNModel, SimpleCNNModel, SimpleUNetModel
 from utils.transforms import transform
-from utils.custom_dataset import CustomImageDataset, CustomImageDatasetBuffer
+from utils.custom_dataset import CustomImageDataset, CustomImageDatasetBuffer, custom_dataset_split
 
 def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dataset_path=None):
 
@@ -15,11 +16,11 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
     # Flowers102 Dataset
     if dataset_path == None:
         dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
+        train_set, val_set = torch.utils.data.dataset.random_split(dataset, [len(dataset)-1000, 1000])
     else:
-        dataset = CustomImageDatasetBuffer(dataset_path, transform)
+        train_set, val_set = custom_dataset_split(dataset_path, transform, val_size=1000)
 
-    train_set, val_set = torch.utils.data.dataset.random_split(dataset, [len(dataset)-1000, 1000])
-    print(f"Dataset size: {len(dataset)}, Train: {len(train_set)}, Val: {len(val_set)}, Number of workers: {num_workers}")
+    print(f"Dataset size: {len(train_set) + len(val_set)}, Train: {len(train_set)}, Val: {len(val_set)}, Number of workers: {num_workers}")
 
     # Data loaders
     training_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=num_workers)
@@ -59,6 +60,9 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
 
     # Max val loss tracking for saving model
     max_val_loss = float("inf")
+
+    # Log loss with tensorboard
+    writer = SummaryWriter()
 
     # Training loop
     for epoch in range(epochs):
@@ -124,8 +128,12 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
         # Epoch Loss
         progress_bar.set_description(f"Epoch {epoch} Train loss: {running_loss / len(training_loader)}, Val loss: {running_val / len(validation_loader)}")
         progress_bar.update(1)
+        writer.add_scalar("Loss/train", running_loss / len(training_loader), epoch)
+        writer.add_scalar("Loss/val", running_val / len(validation_loader), epoch)
 
         # Save Model
         if running_val < max_val_loss:
             torch.save(model, output_file)
             max_val_loss = running_val
+
+    writer.flush()
