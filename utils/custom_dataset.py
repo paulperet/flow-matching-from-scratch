@@ -4,6 +4,8 @@ import cv2
 import random
 import multiprocessing
 
+random.seed(42)
+
 class CustomImageDataset(Dataset):
     def __init__(self, img_dir, transform):
         self.img_dir = img_dir
