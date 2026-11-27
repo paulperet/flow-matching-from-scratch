@@ -2,6 +2,7 @@ import os
 from torch.utils.data import Dataset
 import cv2
 from random import shuffle as shf
+import multiprocessing
 
 class CustomImageDataset(Dataset):
     def __init__(self, img_dir, transform):
@@ -33,7 +34,10 @@ class CustomImageDatasetBufferSingle(Dataset):
     def __init__(self, img_dir, paths, transform):
         self.img_dir = img_dir
         self.transform = transform
-        self.images = [self.transform(cv2.imread(os.path.join(self.img_dir, name))) for name in paths]
+        self.cpu_count = os.cpu_count()
+        print(f"Running data processing on {self.cpu_count} cores")
+        with multiprocessing.Pool(self.cpu_count) as pool:
+            self.images = pool.map(self._process_item, paths)
         print("Dataset loaded in memory")
 
     def __len__(self):
@@ -41,6 +45,9 @@ class CustomImageDatasetBufferSingle(Dataset):
 
     def __getitem__(self, idx):
         return self.images[idx], True
+
+    def _process_item(self, name):
+        return self.transform(cv2.imread(os.path.join(self.img_dir, name)))
 
 def custom_dataset_split(img_dir, transform, val_size=1000, shuffle=True):
     image_paths = os.listdir(img_dir)
