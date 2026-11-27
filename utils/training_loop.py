@@ -11,6 +11,7 @@ from utils.custom_dataset import CustomImageDataset, CustomImageDatasetBuffer
 
 def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dataset_path=None):
 
+    print("Loading dataset")
     # Flowers102 Dataset
     if dataset_path == None:
         dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
