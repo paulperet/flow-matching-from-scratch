@@ -7,13 +7,9 @@ class SimpleNNModel(nn.Module):
 
         self.net = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(3*32*32, 4096),
+            nn.Linear(3*32*32, 2048),
             nn.ReLU(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(),
-            nn.Linear(4096, 3*32*32)
+            nn.Linear(2048, 3*32*32)
         )
 
     def forward(self, inputs, time):

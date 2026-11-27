@@ -33,10 +33,12 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
     # Model
     if model == "mlp":
         model = SimpleNNModel().to(device)
-    if model == "cnn":
+    elif model == "cnn":
         model = SimpleCNNModel().to(device)
-    if model == "unet":
+    elif model == "unet":
         model = SimpleUNetModel().to(device)
+    else:
+        raise ValueError("Model not implemented")
     
     if device == "cuda":
         model.compile()
