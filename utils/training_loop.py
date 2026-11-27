@@ -18,7 +18,7 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
         dataset = torchvision.datasets.Food101('./data', transform=transform, download=True)
         train_set, val_set = torch.utils.data.dataset.random_split(dataset, [len(dataset)-1000, 1000])
     else:
-        train_set, val_set = custom_dataset_split(dataset_path, transform, val_size=1)
+        train_set, val_set = custom_dataset_split(dataset_path, transform, val_size=1000)
 
     print(f"Dataset size: {len(train_set) + len(val_set)}, Train: {len(train_set)}, Val: {len(val_set)}, Number of workers: {num_workers}")
 
