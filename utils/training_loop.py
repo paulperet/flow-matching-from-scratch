@@ -45,8 +45,8 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
     else:
         raise ValueError("Model not implemented")
     
-    if device == "cuda":
-        model.compile()
+    #if device == "cuda":
+    #    model.compile()
     print(f"Model: {type(model).__name__}, Number of parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad)}\n")
 
     # Loss
@@ -69,6 +69,8 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
 
         # Running Loss
         running_loss = 0.0
+
+        model.train()
 
         for i, images in enumerate(training_loader):
             z, _ = images
@@ -104,6 +106,9 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
 
         # Validation loss
         running_val = 0.0
+
+        model.eval()
+
         with torch.no_grad():
             for i, images in enumerate(validation_loader):
                 z, _ = images
