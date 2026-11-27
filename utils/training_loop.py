@@ -26,7 +26,7 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
     validation_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
     if torch.cuda.is_available():
-        device = "cuda"
+        device = "cuda:1"
     elif torch.backends.mps.is_available():
         device = "mps"
     else:
