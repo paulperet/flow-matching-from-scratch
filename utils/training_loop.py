@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torchvision
 from torchvision.transforms import v2
-from torch.utils.tensorboard import SummaryWriter
 
 from tqdm import tqdm
 
@@ -26,7 +25,7 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
     validation_loader = torch.utils.data.DataLoader(val_set, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
     if torch.cuda.is_available():
-        device = "cuda:1"
+        device = "cuda"
     elif torch.backends.mps.is_available():
         device = "mps"
     else:
@@ -59,9 +58,6 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
 
     # Max val loss tracking for saving model
     max_val_loss = float("inf")
-
-    # Log loss with tensorboard
-    writer = SummaryWriter()
 
     # Training loop
     for epoch in range(epochs):
@@ -127,12 +123,8 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
         # Epoch Loss
         progress_bar.set_description(f"Epoch {epoch} Train loss: {running_loss / len(training_loader)}, Val loss: {running_val / len(validation_loader)}")
         progress_bar.update(1)
-        writer.add_scalar("Loss/train", running_loss / len(training_loader), epoch)
-        writer.add_scalar("Loss/val", running_val / len(validation_loader), epoch)
 
         # Save Model
         if running_val < max_val_loss:
             torch.save(model, output_file)
             max_val_loss = running_val
-
-    writer.flush()
