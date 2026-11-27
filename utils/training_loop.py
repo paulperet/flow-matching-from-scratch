@@ -131,7 +131,7 @@ def train(model, batch_size, epochs, output_file='model.pth', num_workers=0, dat
 
 
         # Epoch Loss
-        progress_bar.set_description(f"Epoch {epoch} Train loss: {running_loss / len(training_loader):.4f}, Val loss: {running_val / len(validation_loader):.4f}")
+        progress_bar.set_description(f"Epoch {epoch} Train loss: {(running_loss / len(training_loader)):.4f}, Val loss: {(running_val / len(validation_loader)):.4f}")
         progress_bar.update(1)
         writer.add_scalar("Loss/train", running_loss / len(training_loader), epoch)
         writer.add_scalar("Loss/val", running_val / len(validation_loader), epoch)
